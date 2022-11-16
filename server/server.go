@@ -1,5 +1,8 @@
+//
+
 package server
 
-func Server() {
-
+type Server struct {
+	UserId int
+	T      float32
 }
