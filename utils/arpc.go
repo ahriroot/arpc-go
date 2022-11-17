@@ -17,31 +17,41 @@ const (
 	E_SYNTAX_ERROR = "file [%s]\n\tline [%d]: syntax error"
 )
 
-func GeneratePackage(arpc_meta *ArpcMeta, filename string) string {
-	path := "./"
+func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
+	// dir_name := filepath.Dir(path)
+	// create output dir if not exists
+	if _, err := os.Stat(output); os.IsNotExist(err) {
+		os.Mkdir(output, os.ModePerm)
+	}
+
+	file_name := filepath.Base(path)
+
+	package_name := strings.Replace(file_name, ".", "_", -1)
 	if len(arpc_meta.Package) > 0 {
 		for _, pkg := range arpc_meta.Package {
 			if pkg.Language == PACKAGE {
-				path = pkg.Path
+				package_name = pkg.Name
 			}
 		}
 	}
-	// mkdir
+
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, 0755)
 	}
-	_, fileName := filepath.Split(filename)
-	go_file := strings.Split(fileName, ".")[0] + "_arpc.go"
+
+	go_file := filepath.Join(output, strings.Replace(file_name, ".arpc", ".go", -1))
 
 	localtime := time.Now().Format("1949-10-01 15:00:00")
 
 	file_str := fmt.Sprintf("//%s\n\n", localtime)
 
-	file_str += fmt.Sprintf("package %s\n\n", path)
+	file_str += fmt.Sprintf("package %s\n\n", package_name)
+	file_str += "import \"encoding/json\"\n"
 
 	for k, v := range arpc_meta.Param {
+		file_str += "\n"
 		result := GenerateParamStruct(k, v)
-		file_str += result + "\n\n"
+		file_str += result + "\n"
 	}
 
 	if _, err := os.Stat(go_file); err == nil {
@@ -123,6 +133,7 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 				if len(match) == 3 {
 					arpc_meta.Package = append(arpc_meta.Package, Package{
 						Language: match[1],
+						Name:     match[2],
 						Path:     match[2],
 					})
 				} else {
@@ -227,34 +238,31 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 	return &arpc_meta, nil
 }
 
-func Compile(path string) {
+func Compile(path string, output string) {
 	fmt.Println("========================================")
 	var res, err = CompileArpc(path)
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Printf("%+v \n", res)
-	GeneratePackage(res, path)
+	GeneratePackage(res, path, output)
 	fmt.Println("========================================")
-	// for k, v := range res.Param {
-	// 	result := GenerateParamStruct(k, v)
-	// 	fmt.Println(result)
-	// }
 }
 
-func Compiles(paths []string) {
-	for _, path := range paths {
-		fmt.Println("========================================")
-		var res, err = CompileArpc(path)
-		if err != nil {
-			fmt.Println(err)
+func Compiles(input string, output string) {
+	// output 与 input 同级目录
+	// WalkDir
+	var files []string
+	filepath.Walk(input, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
 		}
-		fmt.Printf("%+v \n", res)
-		GeneratePackage(res, path)
-		fmt.Println("========================================")
-		// for k, v := range res.Param {
-		// 	result := GenerateParamStruct(k, v)
-		// 	fmt.Println(result)
-		// }
+		if strings.HasSuffix(path, ".arpc") {
+			files = append(files, path)
+		}
+		return nil
+	})
+	for _, file := range files {
+		Compile(file, output)
 	}
 }

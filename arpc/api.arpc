@@ -1,0 +1,19 @@
+arpc: 1.0
+
+package {
+    python: api
+    go: api
+}
+
+procedures {
+    procedure GetUserV1(RequestV1): ResponseV1
+}
+
+param ApiRequestV1 {
+    UserId: integer = 1
+}
+
+param ApiResponseV1 {
+    UserId: integer = 1
+    Username: string = 2
+}

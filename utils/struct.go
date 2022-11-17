@@ -2,6 +2,7 @@ package utils
 
 type Package struct {
 	Language string `json:"language"`
+	Name     string `json:"name"`
 	Path     string `json:"path"`
 }
 
