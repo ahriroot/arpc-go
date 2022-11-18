@@ -2,6 +2,7 @@ package test
 
 import (
 	api "arpc-go/arpc_package"
+	arpc_net "arpc-go/net"
 	"arpc-go/utils"
 	"fmt"
 	"net"
@@ -31,8 +32,6 @@ func TestServer(t *testing.T) {
 		os.Exit(1)
 	}
 
-	fmt.Println("connect success")
-
 	st := api.ApiRequestV1{
 		UserId: 1,
 	}
@@ -59,13 +58,30 @@ func TestServer(t *testing.T) {
 	}
 
 	st.Deserialize(buf[:n])
-	fmt.Printf("receive data: %+v \n", st)
 
 	conn.Close()
 }
 
 func TestPrintByte(t *testing.T) {
 	fmt.Println("===================================")
-	fmt.Println(":", fmt.Sprintf("%d", 12))
+	a := 123
+	b := utils.Int64ToBytes(int64(a))
+	fmt.Println(b)
+	fmt.Println(utils.BytesToInt64(b))
+	fmt.Println("===================================")
+}
+
+func TestClient(t *testing.T) {
+	fmt.Println("===================================")
+	conn := arpc_net.ArpcConn{}
+	client := api.NewApiClient(conn)
+	request := &api.ApiRequestV1{
+		UserId: 1,
+	}
+	response, err := client.GetUserV1(request)
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Printf("response: %+v\n", response)
 	fmt.Println("===================================")
 }

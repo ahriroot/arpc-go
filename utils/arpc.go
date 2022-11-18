@@ -239,14 +239,12 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 }
 
 func Compile(path string, output string) {
-	fmt.Println("========================================")
 	var res, err = CompileArpc(path)
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Printf("%+v \n", res)
 	GeneratePackage(res, path, output)
-	fmt.Println("========================================")
 }
 
 func Compiles(input string, output string) {

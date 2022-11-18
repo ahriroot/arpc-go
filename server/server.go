@@ -1,33 +1,41 @@
 package server
 
 import (
-	api "arpc-go/arpc_package"
+	net_ "arpc-go/net"
 	"bytes"
 	"fmt"
 	"io"
 	"net"
+	"strconv"
 )
 
-func Start() {
-	// socket listen 127.0.0.1:9000
+type Server struct {
+	handles map[string]interface{}
+}
+
+func (s *Server) Register(name string, f interface{}) {
+	if s.handles == nil {
+		s.handles = make(map[string]interface{})
+	}
+	s.handles[name] = f
+}
+
+func (s *Server) Start() error {
 	var listener, err = net.Listen("tcp", ":9000")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer listener.Close()
-
-	// accept client connection
 	for {
 		var conn, err = listener.Accept()
 		if err != nil {
-			panic(err)
+			return err
 		}
-		go handleConnection(conn)
+		go s.handle(conn)
 	}
 }
 
-func handleConnection(conn net.Conn) {
-	fmt.Println("handleConnection")
+func (s *Server) handle(conn net.Conn) {
 
 	var buf = make([]byte, 1024)
 
@@ -45,12 +53,13 @@ func handleConnection(conn net.Conn) {
 		}
 
 		if length == 0 {
-			// split 2 次
-			res := bytes.SplitN(buf[:n], []byte{'\n'}, 2)
-			fmt.Printf("res: %+v \n", res)
+			res := bytes.SplitN(buf[:n], []byte{'\n'}, 3)
 			if len(res) > 2 {
-				length = int(buf[0])
-				name = string(buf[1:n])
+				length, err = strconv.Atoi(string(res[0]))
+				if err != nil {
+					panic(err)
+				}
+				name = string(res[1])
 				body = append(body, res[2]...)
 			}
 		} else {
@@ -61,19 +70,20 @@ func handleConnection(conn net.Conn) {
 			break
 		}
 	}
-	fmt.Println("receive data:", length, name, body)
 
-	st := api.ApiRequestV1{
-		UserId: 1,
+	function := s.handles[name]
+	res, err := function.(func([]byte, net_.ArpcConn) ([]byte, error))(body, net_.ArpcConn{})
+	if err != nil {
+		panic(err)
 	}
-	st.Deserialize(body)
-	st.UserId = 2
-	res_length := len(body)
-	res_name := "ApiRequestV1"
-	data := append([]byte{byte(res_length)}, res_name...)
-	data = append(data, body...)
+	var data []byte
+	res_length := len(res)
+	data = append(data, []byte(fmt.Sprintf("%d", res_length))...)
+	data = append(data, '\n')
+	data = append(data, []byte(name)...)
+	data = append(data, '\n')
+	data = append(data, res...)
 	conn.Write(data)
-	fmt.Println("receive struct:", st)
 
 	conn.Close()
 }
