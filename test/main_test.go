@@ -1,14 +1,16 @@
 package test
 
 import (
-	api "arpc-go/arpc_package"
-	arpc_net "arpc-go/net"
-	"arpc-go/utils"
 	"fmt"
 	"net"
 	"os"
 	"path/filepath"
 	"testing"
+
+	api "github.com/ahriroot/arpc-go/arpc_package"
+	net_ "github.com/ahriroot/arpc-go/net"
+	"github.com/ahriroot/arpc-go/server"
+	"github.com/ahriroot/arpc-go/utils"
 )
 
 func TestCompile(t *testing.T) {
@@ -17,7 +19,7 @@ func TestCompile(t *testing.T) {
 	utils.Compiles(input, output)
 }
 
-func TestServer(t *testing.T) {
+func TestServers(t *testing.T) {
 
 	server := "127.0.0.1:9000"
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", server)
@@ -32,7 +34,7 @@ func TestServer(t *testing.T) {
 		os.Exit(1)
 	}
 
-	st := api.ApiRequestV1{
+	st := api.RequestV1{
 		UserId: 1,
 	}
 	body, _ := st.Serialize()
@@ -71,11 +73,28 @@ func TestPrintByte(t *testing.T) {
 	fmt.Println("===================================")
 }
 
+type test struct{}
+
+func (t *test) GetUserV1(request *api.RequestV1) (*api.ResponseV1, error) {
+	return &api.ResponseV1{
+		UserId:   request.UserId,
+		Username: "test",
+	}, nil
+}
+
+func TestServer(t *testing.T) {
+
+	println("Hello, world!")
+	s := server.Server{}
+	api.RegisterGetUserV1(&s, &test{})
+	s.Start()
+}
+
 func TestClient(t *testing.T) {
 	fmt.Println("===================================")
-	conn := arpc_net.ArpcConn{}
+	conn := net_.ArpcConn{}
 	client := api.NewClient(conn)
-	request := &api.ApiRequestV1{
+	request := &api.RequestV1{
 		UserId: 1,
 	}
 	response, err := client.GetUserV1(request)

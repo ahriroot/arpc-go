@@ -6,14 +6,14 @@ package {
 }
 
 procedures {
-    procedure GetUserV1(ApiRequestV1): ApiResponseV1
+    procedure GetUserV1(RequestV1): ResponseV1
 }
 
-param ApiRequestV1 {
+param RequestV1 {
     UserId: integer = 1
 }
 
-param ApiResponseV1 {
+param ResponseV1 {
     UserId: integer = 1
     Username: string = 2
 }

@@ -48,9 +48,10 @@ func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
 	file_str += fmt.Sprintf("package %s\n\n", package_name)
 
 	file_str += `import (
-	"arpc-go/net"
-	"arpc-go/server"
 	"encoding/json"
+	
+	"github.com/ahriroot/arpc-go/net"
+	"github.com/ahriroot/arpc-go/server"
 )`
 
 	file_str += "\n"

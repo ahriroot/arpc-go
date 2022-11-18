@@ -1,12 +1,13 @@
 package server
 
 import (
-	net_ "arpc-go/net"
 	"bytes"
 	"fmt"
 	"io"
 	"net"
 	"strconv"
+
+	net_ "github.com/ahriroot/arpc-go/net"
 )
 
 type Server struct {
