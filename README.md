@@ -41,7 +41,7 @@ arpc-go -i ./arpc -o ./api
 package main
 
 import (
-	"github.com/ahriroot/arpc-go/server"
+	"github.com/ahrirpc/arpc-go/server"
 
 	"project/api"
 )
@@ -71,8 +71,8 @@ import (
     "context"
     "fmt"
 
-    "github.com/ahriroot/arpc-go/client"
-	"github.com/ahriroot/arpc-go/net"
+    "github.com/ahrirpc/arpc-go/client"
+	"github.com/ahrirpc/arpc-go/net"
 
     "project/api"
 )

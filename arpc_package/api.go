@@ -4,13 +4,13 @@ package api
 
 import (
 	"encoding/json"
-	
-	"github.com/ahriroot/arpc-go/net"
-	"github.com/ahriroot/arpc-go/server"
+
+	"github.com/ahrirpc/arpc-go/net"
+	"github.com/ahrirpc/arpc-go/server"
 )
 
 type RequestV1 struct {
-    UserId int
+	UserId int
 }
 
 func (b *RequestV1) New(user_id int) {
@@ -26,13 +26,13 @@ func (b *RequestV1) Deserialize(data []byte) error {
 }
 
 type ResponseV1 struct {
-    UserId   int
-    Username string
+	UserId   int
+	Username string
 }
 
 func (b *ResponseV1) New(user_id int, username string) {
 	b.UserId = user_id
-    b.Username = username
+	b.Username = username
 }
 
 func (b *ResponseV1) Serialize() ([]byte, error) {
@@ -44,11 +44,11 @@ func (b *ResponseV1) Deserialize(data []byte) error {
 }
 
 type client struct {
-	conn net.ArpcConn
+	conn *net.ArpcConn
 }
 
 type Client interface {
-    GetUserV1(*RequestV1) (*ResponseV1, error)
+	GetUserV1(*RequestV1) (*ResponseV1, error)
 }
 
 func (c *client) GetUserV1(request *RequestV1) (*ResponseV1, error) {
@@ -83,6 +83,6 @@ func RegisterGetUserV1(s *server.Server, i Client) {
 	})
 }
 
-func NewClient(c net.ArpcConn) Client {
+func NewClient(c *net.ArpcConn) Client {
 	return &client{c}
 }

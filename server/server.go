@@ -7,11 +7,13 @@ import (
 	"net"
 	"strconv"
 
-	net_ "github.com/ahriroot/arpc-go/net"
+	net_ "github.com/ahrirpc/arpc-go/net"
 )
 
 type Server struct {
 	handles map[string]interface{}
+	Host    string
+	Port    string
 }
 
 func (s *Server) Register(name string, f interface{}) {
@@ -22,7 +24,13 @@ func (s *Server) Register(name string, f interface{}) {
 }
 
 func (s *Server) Start() error {
-	var listener, err = net.Listen("tcp", ":9000")
+	if s.Host == "" {
+		s.Host = "127.0.0.1"
+	}
+	if s.Port == "" {
+		s.Port = "9000"
+	}
+	listener, err := net.Listen("tcp", s.Host+":"+s.Port)
 	if err != nil {
 		return err
 	}

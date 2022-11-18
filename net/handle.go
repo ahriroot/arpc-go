@@ -8,17 +8,12 @@ import (
 	"strconv"
 )
 
-func Handle(req_name string, req_body []byte, _ ArpcConn) ([]byte, error) {
-	server := "localhost:9000"
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", server)
+func Handle(req_name string, req_body []byte, c *ArpcConn) ([]byte, error) {
+	pool, err := (*c.Pool).Get()
 	if err != nil {
 		return nil, err
 	}
-
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		return nil, err
-	}
+	conn := pool.(net.Conn)
 
 	req_length := len(req_body)
 

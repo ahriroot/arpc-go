@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ahriroot/arpc-go/utils"
+	"github.com/ahrirpc/arpc-go/utils"
 )
 
 func print_help() {

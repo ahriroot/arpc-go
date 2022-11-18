@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	api "github.com/ahriroot/arpc-go/arpc_package"
-	net_ "github.com/ahriroot/arpc-go/net"
-	"github.com/ahriroot/arpc-go/server"
-	"github.com/ahriroot/arpc-go/utils"
+	api "github.com/ahrirpc/arpc-go/arpc_package"
+	net_ "github.com/ahrirpc/arpc-go/net"
+	"github.com/ahrirpc/arpc-go/server"
+	"github.com/ahrirpc/arpc-go/utils"
 )
 
 func TestCompile(t *testing.T) {
@@ -85,14 +85,22 @@ func (t *test) GetUserV1(request *api.RequestV1) (*api.ResponseV1, error) {
 func TestServer(t *testing.T) {
 
 	println("Hello, world!")
-	s := server.Server{}
+	s := server.Server{
+		Host: "localhost",
+		Port: "9000",
+	}
 	api.RegisterGetUserV1(&s, &test{})
 	s.Start()
 }
 
 func TestClient(t *testing.T) {
 	fmt.Println("===================================")
-	conn := net_.ArpcConn{}
+	// conn := net_.ArpcConn{}
+	conn, err := net_.NewArpcConn("localhost:9000")
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	client := api.NewClient(conn)
 	request := &api.RequestV1{
 		UserId: 1,
@@ -102,5 +110,15 @@ func TestClient(t *testing.T) {
 		fmt.Println("err:", err)
 	}
 	fmt.Printf("response: %+v\n", response)
+	fmt.Println("===================================")
+}
+
+func TestTcpPool(t *testing.T) {
+	fmt.Println("===================================")
+	conn, err := net_.NewArpcConn("localhost:9000")
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Printf("response: %+v\n", conn)
 	fmt.Println("===================================")
 }

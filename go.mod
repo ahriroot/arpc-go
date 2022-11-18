@@ -1,3 +1,3 @@
-module github.com/ahriroot/arpc-go
+module github.com/ahrirpc/arpc-go
 
 go 1.18

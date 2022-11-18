@@ -50,8 +50,8 @@ func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
 	file_str += `import (
 	"encoding/json"
 	
-	"github.com/ahriroot/arpc-go/net"
-	"github.com/ahriroot/arpc-go/server"
+	"github.com/ahrirpc/arpc-go/net"
+	"github.com/ahrirpc/arpc-go/server"
 )`
 
 	file_str += "\n"
