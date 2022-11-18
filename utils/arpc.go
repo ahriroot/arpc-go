@@ -46,13 +46,24 @@ func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
 	file_str := fmt.Sprintf("//%s\n\n", localtime)
 
 	file_str += fmt.Sprintf("package %s\n\n", package_name)
-	file_str += "import \"encoding/json\"\n"
+
+	file_str += `import (
+	"arpc-go/net"
+	"arpc-go/server"
+	"encoding/json"
+)`
+
+	file_str += "\n"
 
 	for k, v := range arpc_meta.Param {
 		file_str += "\n"
 		result := GenerateParamStruct(k, v)
 		file_str += result + "\n"
 	}
+
+	file_str += GenerateProcedureStruct("Client", arpc_meta.Procedures)
+
+	file_str += GenerateNewClient("Client")
 
 	if _, err := os.Stat(go_file); err == nil {
 		os.Remove(go_file)
@@ -92,7 +103,7 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 	var file *os.File
 	file, err = os.OpenFile(path, os.O_RDONLY, 0)
 	if err != nil {
-		fmt.Println("打开文件出错：", err)
+		fmt.Println("Error reading file:", err)
 	}
 	defer file.Close()
 
@@ -102,7 +113,7 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 	for {
 		n, err := file.Read(buf)
 		if err == io.EOF {
-			fmt.Println("文件读取完毕")
+			fmt.Println("Compiling...")
 			break
 		}
 		if err != nil {
@@ -243,7 +254,6 @@ func Compile(path string, output string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("%+v \n", res)
 	GeneratePackage(res, path, output)
 }
 

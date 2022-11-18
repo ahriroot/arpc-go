@@ -6,7 +6,7 @@ package {
 }
 
 procedures {
-    procedure GetUserV1(RequestV1): ResponseV1
+    procedure GetUserV1(ApiRequestV1): ApiResponseV1
 }
 
 param ApiRequestV1 {

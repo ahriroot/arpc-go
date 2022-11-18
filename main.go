@@ -16,6 +16,6 @@ func (t *test) GetUserV1(request *api.ApiRequestV1) (*api.ApiResponseV1, error) 
 func main() {
 	println("Hello, world!")
 	s := server.Server{}
-	api.RegisterApiServer(&s, &test{})
+	api.RegisterGetUserV1(&s, &test{})
 	s.Start()
 }

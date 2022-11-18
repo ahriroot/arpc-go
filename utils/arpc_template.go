@@ -42,6 +42,61 @@ func TypeStr2GoType(type_str string) string {
 	}
 }
 
+const (
+	T_INTERFACE = `
+type %s interface {
+%s
+}
+`
+
+	T_STRUCT = `
+type %s struct {
+	conn net.ArpcConn
+}
+`
+
+	T_CLIENT = `
+func (c *%s) %s(request *%s) (*%s, error) {
+	req_bytes, err := request.Serialize()
+	if err != nil {
+		return nil, err
+	}
+	data, err := net.Handle("%s", req_bytes, c.conn)
+	if err != nil {
+		return nil, err
+	}
+	response := &%s{}
+	err = response.Deserialize(data)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+`
+
+	T_SERVER = `
+func %s(s *server.Server, i %s) {
+	s.Register("%s", func(request []byte, _ net.ArpcConn) ([]byte, error) {
+		req := &%s{}
+		err := req.Deserialize(request)
+		if err != nil {
+			return nil, err
+		}
+		response, err := i.%s(req)
+		if err != nil {
+			return nil, err
+		}
+		return response.Serialize()
+	})
+}
+`
+	T_NEW_CLIENT = `
+func %s(c net.ArpcConn) %s {
+	return &%s{c}
+}
+`
+)
+
 func GenerateParamStruct(name string, params []Param) string {
 	var params_list = make([]string, 0)
 	var field_list = make([]string, 0)
@@ -87,17 +142,23 @@ func (b *%s) Deserialize(data []byte) error {
 	return st
 }
 
-// // New ApiRequestV1
-// func (b *ApiRequestV1) New(user_id int) {
-// 	b.UserId = user_id
-// }
+func GenerateProcedureStruct(name string, procedure []Procedures) string {
+	var strs_interface []string
+	var strs_client []string
+	var strs_server []string
 
-// // json Serialize ApiRequestV1
-// func (b *ApiRequestV1) Serialize() ([]byte, error) {
-// 	return json.Marshal(b)
-// }
+	for _, p := range procedure {
+		strs_interface = append(strs_interface, fmt.Sprintf("    %s(*%s) (*%s, error)", p.Name, p.Request, p.Response))
+		strs_client = append(strs_client, fmt.Sprintf(T_CLIENT, Snake(name), p.Name, p.Request, p.Response, p.Name, p.Response))
+		strs_server = append(strs_server, fmt.Sprintf(T_SERVER, "Register"+p.Name, name, p.Name, p.Request, p.Name))
+	}
+	st := fmt.Sprintf(T_STRUCT, Snake(name))
+	st += fmt.Sprintf(T_INTERFACE, name, strings.Join(strs_interface, "\n"))
+	st += strings.Join(strs_client, "\n")
+	st += strings.Join(strs_server, "\n")
+	return st
+}
 
-// // json Deserialize ApiRequestV1
-// func (b *ApiRequestV1) Deserialize(data []byte) error {
-// 	return json.Unmarshal(data, b)
-// }
+func GenerateNewClient(name string) string {
+	return fmt.Sprintf(T_NEW_CLIENT, "New"+name, name, Snake(name))
+}

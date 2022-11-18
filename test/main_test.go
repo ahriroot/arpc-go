@@ -74,7 +74,7 @@ func TestPrintByte(t *testing.T) {
 func TestClient(t *testing.T) {
 	fmt.Println("===================================")
 	conn := arpc_net.ArpcConn{}
-	client := api.NewApiClient(conn)
+	client := api.NewClient(conn)
 	request := &api.ApiRequestV1{
 		UserId: 1,
 	}
