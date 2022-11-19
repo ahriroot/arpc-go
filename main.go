@@ -24,7 +24,7 @@ func print_version() {
 	fmt.Println("arpc-go version 0.0.1")
 }
 
-func main() {
+func main_() {
 	args := os.Args
 	len_args := len(args)
 
@@ -65,4 +65,8 @@ func main() {
 	default:
 		fmt.Fprintf(os.Stderr, "Fatal error: %s\n", "Invalid args")
 	}
+}
+
+func main() {
+	main_()
 }

@@ -69,6 +69,7 @@ func (s *Server) handle(conn net.Conn) {
 					panic(err)
 				}
 				name = string(res[1])
+				fmt.Println(name)
 				body = append(body, res[2]...)
 			}
 		} else {
@@ -80,7 +81,10 @@ func (s *Server) handle(conn net.Conn) {
 		}
 	}
 
-	function := s.handles[name]
+	function, has := s.handles[name]
+	if !has {
+		panic("function not found")
+	}
 	res, err := function.(func([]byte, net_.ArpcConn) ([]byte, error))(body, net_.ArpcConn{})
 	if err != nil {
 		panic(err)

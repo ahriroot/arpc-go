@@ -1,7 +1,6 @@
 package net
 
 import (
-	"fmt"
 	"net"
 	"time"
 )
@@ -33,8 +32,6 @@ func NewArpcConn(url string) (*ArpcConn, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("Pool size:", pool.Len())
 
 	return &ArpcConn{
 		Pool: &pool,

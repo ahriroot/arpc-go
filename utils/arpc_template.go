@@ -51,7 +51,7 @@ type %s interface {
 
 	T_STRUCT = `
 type %s struct {
-	conn net.ArpcConn
+	conn *net.ArpcConn
 }
 `
 
@@ -91,7 +91,7 @@ func %s(s *server.Server, i %s) {
 }
 `
 	T_NEW_CLIENT = `
-func %s(c net.ArpcConn) %s {
+func %s(c *net.ArpcConn) %s {
 	return &%s{c}
 }
 `
@@ -102,20 +102,25 @@ func GenerateParamStruct(name string, params []Param) string {
 	var field_list = make([]string, 0)
 	var st = fmt.Sprintf("type %s struct {", name)
 	var tmp = make(map[string]string)
-	var max_length = 0
+	var max_field_length = 0
+	var max_type_length = 0
 	for _, param := range params {
-		length := len(param.Name)
-		if length > max_length {
-			max_length = length
-		}
 		snake := Snake(param.Name)
 		tmp[param.Name] = TypeStr2GoType(param.Type)
+		field_length := len(param.Name)
+		if field_length > max_field_length {
+			max_field_length = field_length
+		}
+		type_length := len(tmp[param.Name])
+		if type_length > max_type_length {
+			max_type_length = type_length
+		}
 		params_list = append(params_list, fmt.Sprintf("%s %s", snake, tmp[param.Name]))
 		field_list = append(field_list, fmt.Sprintf("b.%s = %s", param.Name, snake))
 	}
-	format := fmt.Sprintf("\n    %%-%ds %%s", max_length)
+	format := fmt.Sprintf("\n    %%-%ds %%-%ds `json:\"%%s\"`", max_field_length, max_type_length)
 	for k, v := range tmp {
-		st += fmt.Sprintf(format, k, v)
+		st += fmt.Sprintf(format, k, v, Snake(k))
 	}
 	st += "\n}"
 

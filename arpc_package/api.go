@@ -1,16 +1,16 @@
-//119499-110-11 23:00:00
+//119239-110-11 19:00:00
 
 package api
 
 import (
 	"encoding/json"
-
+	
 	"github.com/ahrirpc/arpc-go/net"
 	"github.com/ahrirpc/arpc-go/server"
 )
 
 type RequestV1 struct {
-	UserId int
+    UserId int `json:"user_id"`
 }
 
 func (b *RequestV1) New(user_id int) {
@@ -26,13 +26,13 @@ func (b *RequestV1) Deserialize(data []byte) error {
 }
 
 type ResponseV1 struct {
-	UserId   int
-	Username string
+    UserId   int    `json:"user_id"`
+    Username string `json:"username"`
 }
 
 func (b *ResponseV1) New(user_id int, username string) {
 	b.UserId = user_id
-	b.Username = username
+    b.Username = username
 }
 
 func (b *ResponseV1) Serialize() ([]byte, error) {
@@ -48,7 +48,7 @@ type client struct {
 }
 
 type Client interface {
-	GetUserV1(*RequestV1) (*ResponseV1, error)
+    GetUserV1(*RequestV1) (*ResponseV1, error)
 }
 
 func (c *client) GetUserV1(request *RequestV1) (*ResponseV1, error) {
