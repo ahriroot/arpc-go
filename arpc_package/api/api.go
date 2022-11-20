@@ -1,4 +1,4 @@
-//119239-110-11 19:00:00
+//119189-110-11 20:00:00
 
 package api
 
@@ -49,6 +49,7 @@ type client struct {
 
 type Client interface {
     GetUserV1(*RequestV1) (*ResponseV1, error)
+    PostUserV1(*ResponseV1) (*RequestV1, error)
 }
 
 func (c *client) GetUserV1(request *RequestV1) (*ResponseV1, error) {
@@ -56,7 +57,7 @@ func (c *client) GetUserV1(request *RequestV1) (*ResponseV1, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := net.Handle("GetUserV1", req_bytes, c.conn)
+	data, err := net.Handle("XVlBzg.1", req_bytes, c.conn)
 	if err != nil {
 		return nil, err
 	}
@@ -68,14 +69,44 @@ func (c *client) GetUserV1(request *RequestV1) (*ResponseV1, error) {
 	return response, nil
 }
 
-func RegisterGetUserV1(s *server.Server, i Client) {
-	s.Register("GetUserV1", func(request []byte, _ net.ArpcConn) ([]byte, error) {
+
+func (c *client) PostUserV1(request *ResponseV1) (*RequestV1, error) {
+	req_bytes, err := request.Serialize()
+	if err != nil {
+		return nil, err
+	}
+	data, err := net.Handle("XVlBzg.2", req_bytes, c.conn)
+	if err != nil {
+		return nil, err
+	}
+	response := &RequestV1{}
+	err = response.Deserialize(data)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func Register(s *server.Server, i Client) {
+    s.Register("XVlBzg.1", func(request []byte, _ net.ArpcConn) ([]byte, error) {
 		req := &RequestV1{}
 		err := req.Deserialize(request)
 		if err != nil {
 			return nil, err
 		}
 		response, err := i.GetUserV1(req)
+		if err != nil {
+			return nil, err
+		}
+		return response.Serialize()
+	})
+    s.Register("XVlBzg.2", func(request []byte, _ net.ArpcConn) ([]byte, error) {
+		req := &ResponseV1{}
+		err := req.Deserialize(request)
+		if err != nil {
+			return nil, err
+		}
+		response, err := i.PostUserV1(req)
 		if err != nil {
 			return nil, err
 		}

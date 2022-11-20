@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	api "github.com/ahrirpc/arpc-go/arpc_package"
+	api "github.com/ahrirpc/arpc-go/arpc_package/api"
 	net_ "github.com/ahrirpc/arpc-go/net"
 	"github.com/ahrirpc/arpc-go/utils"
 )

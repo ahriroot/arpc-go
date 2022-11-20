@@ -8,6 +8,7 @@ type Package struct {
 
 type Procedures struct {
 	Name     string `json:"name"`
+	Index    int    `json:"index"`
 	Request  string `json:"request"`
 	Response string `json:"response"`
 }

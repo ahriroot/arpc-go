@@ -61,7 +61,7 @@ func (c *%s) %s(request *%s) (*%s, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := net.Handle("%s", req_bytes, c.conn)
+	data, err := net.Handle("%s.%d", req_bytes, c.conn)
 	if err != nil {
 		return nil, err
 	}
@@ -74,9 +74,7 @@ func (c *%s) %s(request *%s) (*%s, error) {
 }
 `
 
-	T_SERVER = `
-func %s(s *server.Server, i %s) {
-	s.Register("%s", func(request []byte, _ net.ArpcConn) ([]byte, error) {
+	T_SERVER = `    s.Register("%s.%d", func(request []byte, _ net.ArpcConn) ([]byte, error) {
 		req := &%s{}
 		err := req.Deserialize(request)
 		if err != nil {
@@ -87,9 +85,8 @@ func %s(s *server.Server, i %s) {
 			return nil, err
 		}
 		return response.Serialize()
-	})
-}
-`
+	})`
+
 	T_NEW_CLIENT = `
 func %s(c *net.ArpcConn) %s {
 	return &%s{c}
@@ -148,19 +145,27 @@ func (b *%s) Deserialize(data []byte) error {
 }
 
 func GenerateProcedureStruct(name string, procedure []Procedures) string {
+	var package_id = RandomString(6)
+
 	var strs_interface []string
 	var strs_client []string
 	var strs_server []string
 
 	for _, p := range procedure {
 		strs_interface = append(strs_interface, fmt.Sprintf("    %s(*%s) (*%s, error)", p.Name, p.Request, p.Response))
-		strs_client = append(strs_client, fmt.Sprintf(T_CLIENT, Snake(name), p.Name, p.Request, p.Response, p.Name, p.Response))
-		strs_server = append(strs_server, fmt.Sprintf(T_SERVER, "Register"+p.Name, name, p.Name, p.Request, p.Name))
+		strs_client = append(strs_client, fmt.Sprintf(T_CLIENT, Snake(name), p.Name, p.Request, p.Response, package_id, p.Index, p.Response))
+		strs_server = append(strs_server, fmt.Sprintf(T_SERVER, package_id, p.Index, p.Request, p.Name))
 	}
 	st := fmt.Sprintf(T_STRUCT, Snake(name))
 	st += fmt.Sprintf(T_INTERFACE, name, strings.Join(strs_interface, "\n"))
 	st += strings.Join(strs_client, "\n")
-	st += strings.Join(strs_server, "\n")
+
+	var wapper = `
+func %s(s *server.Server, i %s) {
+%s
+}
+`
+	st += fmt.Sprintf(wapper, "Register", name, strings.Join(strs_server, "\n"))
 	return st
 }
 

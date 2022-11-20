@@ -35,10 +35,6 @@ func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
 		}
 	}
 
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.MkdirAll(path, 0755)
-	}
-
 	go_file := filepath.Join(output, strings.Replace(file_name, ".arpc", ".go", -1))
 
 	localtime := time.Now().Format("1949-10-01 15:00:00")
@@ -52,9 +48,8 @@ func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
 	
 	"github.com/ahrirpc/arpc-go/net"
 	"github.com/ahrirpc/arpc-go/server"
-)`
-
-	file_str += "\n"
+)
+`
 
 	for k, v := range arpc_meta.Param {
 		file_str += "\n"
@@ -114,7 +109,7 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 	for {
 		n, err := file.Read(buf)
 		if err == io.EOF {
-			fmt.Println("Compiling...")
+			fmt.Printf("Compiling: %s\n", path)
 			break
 		}
 		if err != nil {
@@ -127,7 +122,13 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 
 	for _, line := range lines {
 		line_num++
+		if strings.Contains(line, "//") {
+			line = strings.Split(line, "//")[0]
+		}
 		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "//") {
+			continue
+		}
 		if len(line) == 0 {
 			continue
 		}
@@ -170,6 +171,7 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 				if len(match) == 4 {
 					arpc_meta.Procedures = append(arpc_meta.Procedures, Procedures{
 						Name:     match[1],
+						Index:    len(arpc_meta.Procedures) + 1,
 						Request:  match[2],
 						Response: match[3],
 					})
@@ -215,7 +217,6 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 				}
 				handle_procedures = true
 				arpc_meta.Procedures = make([]Procedures, 0)
-				continue
 			} else if strings.HasPrefix(line, "param") {
 				// 正则匹配 param RequestV1 {
 				var reg = regexp.MustCompile(`^param\s+(\w+)\s+{`)
@@ -223,7 +224,7 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 				if len(match) == 2 {
 					param_name = match[1]
 					if arpc_meta.Param[param_name] != nil {
-						return nil, fmt.Errorf("file [%s]\n\tline [%d]: repeated param", path, line_num)
+						return nil, fmt.Errorf("file [%s]\n\tline [%d]: repeated param: [%s]", path, line_num, param_name)
 					}
 					handle_param = true
 					// arpc_meta.Param is nil?
@@ -272,6 +273,17 @@ func Compiles(input string, output string) {
 		return nil
 	})
 	for _, file := range files {
-		Compile(file, output)
+		c_path, err := filepath.Rel(input, file)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		c_path = filepath.Dir(c_path)
+		generate := filepath.Join(output, c_path)
+		if err := os.MkdirAll(filepath.Dir(generate), 0755); err != nil {
+			fmt.Println(err)
+			return
+		}
+		Compile(file, generate)
 	}
 }

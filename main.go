@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/ahrirpc/arpc-go/utils"
 )
@@ -40,22 +39,13 @@ func main_() {
 			fmt.Fprintf(os.Stderr, "Fatal error: %s\n", "Invalid args")
 		}
 	case 5:
-		var err error
 		var input string = ""
 		var output string = ""
 		if args[1] == "--input" || args[1] == "-i" {
-			input, err = filepath.Abs(args[2])
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Fatal error: %s\n", err.Error())
-				os.Exit(1)
-			}
+			input = args[2]
 		}
 		if args[3] == "--output" || args[3] == "-o" {
-			output, err = filepath.Abs(args[4])
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Fatal error: %s\n", err.Error())
-				os.Exit(1)
-			}
+			output = args[4]
 		}
 		if input == "" || output == "" {
 			fmt.Fprintf(os.Stderr, "Fatal error: %s\n", "Invalid args")

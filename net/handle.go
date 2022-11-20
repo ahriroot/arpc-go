@@ -9,11 +9,25 @@ import (
 )
 
 func Handle(req_name string, req_body []byte, c *ArpcConn) ([]byte, error) {
-	pool, err := (*c.Pool).Get()
-	if err != nil {
-		return nil, err
+	var conn net.Conn
+	if c.Pool == nil {
+		var err error
+		var tcpAddr *net.TCPAddr
+		tcpAddr, err = net.ResolveTCPAddr("tcp4", c.Url)
+		if err != nil {
+			return nil, err
+		}
+		conn, err = net.DialTCP("tcp", nil, tcpAddr)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		pool, err := (*c.Pool).Get()
+		if err != nil {
+			return nil, err
+		}
+		conn = pool.(net.Conn)
 	}
-	conn := pool.(net.Conn)
 
 	req_length := len(req_body)
 

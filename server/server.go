@@ -58,7 +58,6 @@ func (s *Server) handle(conn net.Conn) {
 			if err == io.EOF {
 				break
 			}
-			panic(err)
 		}
 
 		if length == 0 {

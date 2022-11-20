@@ -1,12 +1,13 @@
 arpc: 1.0
 
 package {
-    python: api
-    go: api
+    python: test
+    go: test
 }
 
 procedures {
     procedure GetUserV1(RequestV1): ResponseV1
+    procedure PostUserV1(ResponseV1): RequestV1
 }
 
 param RequestV1 {

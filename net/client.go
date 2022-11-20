@@ -6,10 +6,18 @@ import (
 )
 
 type ArpcConn struct {
+	Url  string
 	Pool *Pool
 }
 
 func NewArpcConn(url string) (*ArpcConn, error) {
+	return &ArpcConn{
+		Url:  url,
+		Pool: nil,
+	}, nil
+}
+
+func NewArpcConnPool(url string) (*ArpcConn, error) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", url)
 	if err != nil {
 		return nil, err
