@@ -1,12 +1,12 @@
-//119189-110-11 20:00:00
+//119579-110-11 23:00:00
 
 package api
 
 import (
 	"encoding/json"
 	
-	"github.com/ahrirpc/arpc-go/net"
-	"github.com/ahrirpc/arpc-go/server"
+	arpc_client "github.com/ahrirpc/arpc-go/client"
+	arpc_server "github.com/ahrirpc/arpc-go/server"
 )
 
 type RequestV1 struct {
@@ -26,8 +26,8 @@ func (b *RequestV1) Deserialize(data []byte) error {
 }
 
 type ResponseV1 struct {
-    UserId   int    `json:"user_id"`
     Username string `json:"username"`
+    UserId   int    `json:"user_id"`
 }
 
 func (b *ResponseV1) New(user_id int, username string) {
@@ -44,7 +44,7 @@ func (b *ResponseV1) Deserialize(data []byte) error {
 }
 
 type client struct {
-	conn *net.ArpcConn
+	conn *arpc_client.ArpcConn
 }
 
 type Client interface {
@@ -57,7 +57,7 @@ func (c *client) GetUserV1(request *RequestV1) (*ResponseV1, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := net.Handle("XVlBzg.1", req_bytes, c.conn)
+	data, err := arpc_client.Handle("XVlBzg.1", req_bytes, c.conn)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *client) PostUserV1(request *ResponseV1) (*RequestV1, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := net.Handle("XVlBzg.2", req_bytes, c.conn)
+	data, err := arpc_client.Handle("XVlBzg.2", req_bytes, c.conn)
 	if err != nil {
 		return nil, err
 	}
@@ -87,8 +87,8 @@ func (c *client) PostUserV1(request *ResponseV1) (*RequestV1, error) {
 	return response, nil
 }
 
-func Register(s *server.Server, i Client) {
-    s.Register("XVlBzg.1", func(request []byte, _ net.ArpcConn) ([]byte, error) {
+func Register(s *arpc_server.Server, i Client) {
+    s.Register("XVlBzg.1", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
 		req := &RequestV1{}
 		err := req.Deserialize(request)
 		if err != nil {
@@ -100,7 +100,7 @@ func Register(s *server.Server, i Client) {
 		}
 		return response.Serialize()
 	})
-    s.Register("XVlBzg.2", func(request []byte, _ net.ArpcConn) ([]byte, error) {
+    s.Register("XVlBzg.2", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
 		req := &ResponseV1{}
 		err := req.Deserialize(request)
 		if err != nil {
@@ -114,6 +114,6 @@ func Register(s *server.Server, i Client) {
 	})
 }
 
-func NewClient(c *net.ArpcConn) Client {
+func NewClient(c *arpc_client.ArpcConn) Client {
 	return &client{c}
 }

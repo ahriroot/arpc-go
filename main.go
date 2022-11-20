@@ -8,7 +8,7 @@ import (
 )
 
 func print_help() {
-	var text string = `Usage: arpc [options] [dir]
+	var text string = `Usage: arpc [options] [value]
 Options:
   -h, --help     output usage information
   -v, --version  output the version number
@@ -36,7 +36,7 @@ func main_() {
 		} else if args[1] == "--version" || args[1] == "-v" {
 			print_version()
 		} else {
-			fmt.Fprintf(os.Stderr, "Fatal error: %s\n", "Invalid args")
+			fmt.Fprintf(os.Stderr, "Fatal error: Invalid args\n")
 		}
 	case 5:
 		var input string = ""
@@ -48,12 +48,12 @@ func main_() {
 			output = args[4]
 		}
 		if input == "" || output == "" {
-			fmt.Fprintf(os.Stderr, "Fatal error: %s\n", "Invalid args")
+			fmt.Fprintf(os.Stderr, "Fatal error: Invalid args\n")
 			os.Exit(1)
 		}
 		utils.Compiles(input, output)
 	default:
-		fmt.Fprintf(os.Stderr, "Fatal error: %s\n", "Invalid args")
+		fmt.Fprintf(os.Stderr, "Fatal error: Invalid args\n")
 	}
 }
 

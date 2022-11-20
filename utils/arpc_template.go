@@ -51,7 +51,7 @@ type %s interface {
 
 	T_STRUCT = `
 type %s struct {
-	conn *net.ArpcConn
+	conn *arpc_client.ArpcConn
 }
 `
 
@@ -61,7 +61,7 @@ func (c *%s) %s(request *%s) (*%s, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := net.Handle("%s.%d", req_bytes, c.conn)
+	data, err := arpc_client.Handle("%s.%d", req_bytes, c.conn)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *%s) %s(request *%s) (*%s, error) {
 }
 `
 
-	T_SERVER = `    s.Register("%s.%d", func(request []byte, _ net.ArpcConn) ([]byte, error) {
+	T_SERVER = `    s.Register("%s.%d", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
 		req := &%s{}
 		err := req.Deserialize(request)
 		if err != nil {
@@ -88,7 +88,7 @@ func (c *%s) %s(request *%s) (*%s, error) {
 	})`
 
 	T_NEW_CLIENT = `
-func %s(c *net.ArpcConn) %s {
+func %s(c *arpc_client.ArpcConn) %s {
 	return &%s{c}
 }
 `
@@ -161,7 +161,7 @@ func GenerateProcedureStruct(name string, procedure []Procedures) string {
 	st += strings.Join(strs_client, "\n")
 
 	var wapper = `
-func %s(s *server.Server, i %s) {
+func %s(s *arpc_server.Server, i %s) {
 %s
 }
 `

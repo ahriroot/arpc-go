@@ -7,7 +7,7 @@ import (
 	"net"
 	"strconv"
 
-	net_ "github.com/ahrirpc/arpc-go/net"
+	net_ "github.com/ahrirpc/arpc-go/client"
 )
 
 type Server struct {

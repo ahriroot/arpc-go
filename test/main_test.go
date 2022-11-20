@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	api "github.com/ahrirpc/arpc-go/arpc_package/api"
-	net_ "github.com/ahrirpc/arpc-go/net"
+	arpc_client "github.com/ahrirpc/arpc-go/client"
 	"github.com/ahrirpc/arpc-go/utils"
 )
 
@@ -19,7 +19,7 @@ func TestCompile(t *testing.T) {
 func TestClient(t *testing.T) {
 	fmt.Println("===================================")
 	// conn := net_.ArpcConn{}
-	conn, err := net_.NewArpcConn("localhost:9000")
+	conn, err := arpc_client.NewArpcConn("localhost:9000")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -38,7 +38,7 @@ func TestClient(t *testing.T) {
 
 func TestTcpPool(t *testing.T) {
 	fmt.Println("===================================")
-	conn, err := net_.NewArpcConn("localhost:9000")
+	conn, err := arpc_client.NewArpcConn("localhost:9000")
 	if err != nil {
 		fmt.Println("err:", err)
 	}

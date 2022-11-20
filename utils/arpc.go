@@ -18,8 +18,6 @@ const (
 )
 
 func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
-	// dir_name := filepath.Dir(path)
-	// create output dir if not exists
 	if _, err := os.Stat(output); os.IsNotExist(err) {
 		os.Mkdir(output, os.ModePerm)
 	}
@@ -31,6 +29,7 @@ func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
 		for _, pkg := range arpc_meta.Package {
 			if pkg.Language == PACKAGE {
 				package_name = pkg.Name
+				break
 			}
 		}
 	}
@@ -46,8 +45,8 @@ func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
 	file_str += `import (
 	"encoding/json"
 	
-	"github.com/ahrirpc/arpc-go/net"
-	"github.com/ahrirpc/arpc-go/server"
+	arpc_client "github.com/ahrirpc/arpc-go/client"
+	arpc_server "github.com/ahrirpc/arpc-go/server"
 )
 `
 
@@ -260,8 +259,6 @@ func Compile(path string, output string) {
 }
 
 func Compiles(input string, output string) {
-	// output 与 input 同级目录
-	// WalkDir
 	var files []string
 	filepath.Walk(input, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
