@@ -33,6 +33,7 @@ type Param struct {
 
 type ArpcMeta struct {
 	Version    string             `json:"version"`
+	Unique     string             `json:"unique"`
 	Package    []Package          `json:"package"`
 	Procedures []Procedures       `json:"procedures"`
 	Param      map[string][]Param `json:"param"`

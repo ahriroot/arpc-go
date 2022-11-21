@@ -1,5 +1,7 @@
 arpc: 1.0
 
+unique: arpc2
+
 package {
     python: test
     go: test

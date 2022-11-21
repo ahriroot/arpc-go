@@ -1,4 +1,4 @@
-//119579-110-11 23:00:00
+//119309-110-11 18:00:00
 
 package test
 
@@ -8,6 +8,22 @@ import (
 	arpc_client "github.com/ahrirpc/arpc-go/client"
 	arpc_server "github.com/ahrirpc/arpc-go/server"
 )
+
+type RequestV1 struct {
+    UserId int `json:"user_id"`
+}
+
+func (b *RequestV1) New(user_id int) {
+	b.UserId = user_id
+}
+
+func (b *RequestV1) Serialize() ([]byte, error) {
+	return json.Marshal(b)
+}
+
+func (b *RequestV1) Deserialize(data []byte) error {
+	return json.Unmarshal(data, b)
+}
 
 type ResponseV1 struct {
     UserId   int    `json:"user_id"`
@@ -27,22 +43,6 @@ func (b *ResponseV1) Deserialize(data []byte) error {
 	return json.Unmarshal(data, b)
 }
 
-type RequestV1 struct {
-    UserId int `json:"user_id"`
-}
-
-func (b *RequestV1) New(user_id int) {
-	b.UserId = user_id
-}
-
-func (b *RequestV1) Serialize() ([]byte, error) {
-	return json.Marshal(b)
-}
-
-func (b *RequestV1) Deserialize(data []byte) error {
-	return json.Unmarshal(data, b)
-}
-
 type client struct {
 	conn *arpc_client.ArpcConn
 }
@@ -57,7 +57,7 @@ func (c *client) GetUserV1(request *RequestV1) (*ResponseV1, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := arpc_client.Handle("baiCMR.1", req_bytes, c.conn)
+	data, err := arpc_client.Handle("arpc2.1", req_bytes, c.conn)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *client) PostUserV1(request *ResponseV1) (*RequestV1, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := arpc_client.Handle("baiCMR.2", req_bytes, c.conn)
+	data, err := arpc_client.Handle("arpc2.2", req_bytes, c.conn)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *client) PostUserV1(request *ResponseV1) (*RequestV1, error) {
 }
 
 func Register(s *arpc_server.Server, i Client) {
-    s.Register("baiCMR.1", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
+    s.Register("arpc2.1", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
 		req := &RequestV1{}
 		err := req.Deserialize(request)
 		if err != nil {
@@ -100,7 +100,7 @@ func Register(s *arpc_server.Server, i Client) {
 		}
 		return response.Serialize()
 	})
-    s.Register("baiCMR.2", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
+    s.Register("arpc2.2", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
 		req := &ResponseV1{}
 		err := req.Deserialize(request)
 		if err != nil {

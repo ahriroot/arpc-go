@@ -1,5 +1,7 @@
 arpc: 1.0
 
+unique: arpc1
+
 package {
     python: api
     go: api

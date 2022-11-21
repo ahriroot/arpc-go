@@ -56,7 +56,7 @@ func GeneratePackage(arpc_meta *ArpcMeta, path string, output string) string {
 		file_str += result + "\n"
 	}
 
-	file_str += GenerateProcedureStruct("Client", arpc_meta.Procedures)
+	file_str += GenerateProcedureStruct("Client", arpc_meta.Unique, arpc_meta.Procedures)
 
 	file_str += GenerateNewClient("Client")
 
@@ -240,6 +240,15 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 				var match = reg.FindStringSubmatch(line)
 				if len(match) == 2 {
 					arpc_meta.Version = match[1]
+				} else {
+					return nil, fmt.Errorf(E_SYNTAX_ERROR, path, line_num)
+				}
+			} else if strings.HasPrefix(line, "unique") {
+				// 正则匹配 arpc: *
+				var reg = regexp.MustCompile(`^unique:\s*(.*)`)
+				var match = reg.FindStringSubmatch(line)
+				if len(match) == 2 {
+					arpc_meta.Unique = match[1]
 				} else {
 					return nil, fmt.Errorf(E_SYNTAX_ERROR, path, line_num)
 				}

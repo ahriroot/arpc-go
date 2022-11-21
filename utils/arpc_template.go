@@ -144,8 +144,8 @@ func (b *%s) Deserialize(data []byte) error {
 	return st
 }
 
-func GenerateProcedureStruct(name string, procedure []Procedures) string {
-	var package_id = RandomString(6)
+func GenerateProcedureStruct(name string, unique string, procedure []Procedures) string {
+	var package_id = unique
 
 	var strs_interface []string
 	var strs_client []string
