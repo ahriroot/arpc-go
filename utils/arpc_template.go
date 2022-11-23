@@ -61,7 +61,7 @@ func (c *%s) %s(request *%s) (*%s, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := arpc_client.Handle("%s.%d", req_bytes, c.conn)
+	data, err := c.conn.Handle("%s.%d", req_bytes)
 	if err != nil {
 		return nil, err
 	}

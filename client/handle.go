@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func Handle(req_name string, req_body []byte, c *ArpcConn) ([]byte, error) {
+func (c *ArpcConn) Handle(req_name string, req_body []byte) ([]byte, error) {
 	var conn net.Conn
 	if c.Pool == nil {
 		var err error

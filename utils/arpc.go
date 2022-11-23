@@ -170,7 +170,7 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 				if len(match) == 4 {
 					arpc_meta.Procedures = append(arpc_meta.Procedures, Procedures{
 						Name:     match[1],
-						Index:    len(arpc_meta.Procedures) + 1,
+						Index:    len(arpc_meta.Procedures),
 						Request:  match[2],
 						Response: match[3],
 					})

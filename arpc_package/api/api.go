@@ -1,4 +1,4 @@
-//119309-110-11 18:00:00
+//119319-110-11 22:00:00
 
 package api
 
@@ -57,7 +57,7 @@ func (c *client) GetUserV1(request *RequestV1) (*ResponseV1, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := arpc_client.Handle("arpc1.1", req_bytes, c.conn)
+	data, err := c.conn.Handle("arpc1.0", req_bytes)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *client) PostUserV1(request *ResponseV1) (*RequestV1, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := arpc_client.Handle("arpc1.2", req_bytes, c.conn)
+	data, err := c.conn.Handle("arpc1.1", req_bytes)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *client) PostUserV1(request *ResponseV1) (*RequestV1, error) {
 }
 
 func Register(s *arpc_server.Server, i Client) {
-    s.Register("arpc1.1", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
+    s.Register("arpc1.0", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
 		req := &RequestV1{}
 		err := req.Deserialize(request)
 		if err != nil {
@@ -100,7 +100,7 @@ func Register(s *arpc_server.Server, i Client) {
 		}
 		return response.Serialize()
 	})
-    s.Register("arpc1.2", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
+    s.Register("arpc1.1", func(request []byte, _ arpc_client.ArpcConn) ([]byte, error) {
 		req := &ResponseV1{}
 		err := req.Deserialize(request)
 		if err != nil {
