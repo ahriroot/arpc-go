@@ -186,7 +186,7 @@ func CompileArpc(path string) (*ArpcMeta, error) {
 				continue
 			} else {
 				// 正则匹配 name: type = index
-				var reg = regexp.MustCompile(`^\s*(\w+):\s*(\w+)\s*=\s*(\d+)`)
+				var reg = regexp.MustCompile(`^\s*(\w+):\s*([\w|\[|\]|\{|\}]+)\s*=\s*(\d+)`)
 				var match = reg.FindStringSubmatch(line)
 				if len(match) == 4 {
 					index, err := strconv.Atoi(match[3])

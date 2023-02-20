@@ -19,4 +19,6 @@ param RequestV1 {
 param ResponseV1 {
     UserId: integer = 1
     Username: string = 2
+    Test: map[string]interface{} = 3
+    Data: RequestV1 = 4
 }

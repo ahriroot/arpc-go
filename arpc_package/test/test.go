@@ -1,4 +1,4 @@
-//119319-110-11 22:00:00
+//29459-20-02 14:00:00
 
 package test
 
@@ -26,13 +26,17 @@ func (b *RequestV1) Deserialize(data []byte) error {
 }
 
 type ResponseV1 struct {
-    UserId   int    `json:"user_id"`
-    Username string `json:"username"`
+    UserId   int                    `json:"user_id"`
+    Username string                 `json:"username"`
+    Test     map[string]interface{} `json:"test"`
+    Data     RequestV1              `json:"data"`
 }
 
-func (b *ResponseV1) New(user_id int, username string) {
+func (b *ResponseV1) New(user_id int, username string, test map[string]interface{}, data RequestV1) {
 	b.UserId = user_id
     b.Username = username
+    b.Test = test
+    b.Data = data
 }
 
 func (b *ResponseV1) Serialize() ([]byte, error) {
